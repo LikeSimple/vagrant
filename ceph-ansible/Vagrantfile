@@ -1,0 +1,64 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  # 配置客户机代理走本地
+  if Vagrant.has_plugin?("vagrant-proxyconf")
+
+    host_proxy = "http://192.168.1.101:8118/"
+
+    config.proxy.http     = local_proxy
+    config.proxy.https    = local_proxy
+    config.proxy.ftp      = local_proxy
+    config.apt_proxy.http = local_proxy
+    config.proxy.no_proxy = "localhost,127.0.0.1,.example.com,192.168.0.0/16,172.16.0.0/12,10.0.0.0/8"
+  end
+
+  if Vagrant.has_plugin?("vagrant-hostmanager")
+    config.hostmanager.enabled = true
+    config.hostmanager.manage_guest = true
+    config.hostmanager.include_offline = true
+  end
+  instances_count = 3
+  bridge_interface = "enp4s0f0"
+  host_prifix = "ceph"
+
+  (1..instances_count).each do |i|
+  
+    config.vm.define "#{host_prifix}-#{i}" do |node|
+
+      node.vm.box_check_update = false
+      node.vm.box = "ubuntu/xenial64"
+      node.vm.hostname = "#{host_prifix}-#{i}"
+      # node.vm.network "forwarded_port", guest: 80, host: 8080
+      node.vm.network "private_network", ip: "192.168.33.#{100+i}"
+
+      node.vm.network "public_network", bridge: bridge_interface, auto_config: true
+      # config.vm.synced_folder "../data", "/vagrant_data"
+
+      node.vm.provider "virtualbox" do |vb|
+      
+        vb.gui = false
+        vb.memory = "4096"
+        vb.cpus = 2
+        vb.name = "#{host_prifix}-#{i}"
+      end
+      
+      config.vm.provision :shell, :inline => "DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -yq python && apt-get install language-pack-zh", :privileged => true
+    end
+    #
+    # View the documentation for the provider you are using for more
+    # information on available options.
+
+    # Enable provisioning with a shell script. Additional provisioners such as
+    # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+    # documentation for more information about their specific syntax and use.
+    # config.vm.provision "shell", inline: <<-SHELL
+    #   apt-get update
+    #   apt-get install -y apache2
+    # SHELL
+  end
+
+
+end
