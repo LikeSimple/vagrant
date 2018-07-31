@@ -27,7 +27,7 @@ Vagrant.configure("2") do |config|
   num_guests = 1
   vb_cpus  = 2
   vb_memory = "2048"
-  bridge_interface = "en7: USB 10/100/1000 LAN"
+  bridge_interface = "enp4s0f0"
   guest_prifix = "ceph"
 
   (1..num_guests).each do |i|
@@ -35,7 +35,7 @@ Vagrant.configure("2") do |config|
     guest_name = "#{guest_prifix}-#{i}"
 
     config.vm.define guest_name do |node|
-      node.proxy.enabled  = false
+      node.proxy.enabled  = true
       node.vm.box_check_update = false
       node.vm.box = "ubuntu/xenial64"
       node.vm.hostname = guest_name
@@ -53,17 +53,19 @@ Vagrant.configure("2") do |config|
         vb.name = guest_name
       end
       
-      if (i == )
+      
       config.vm.provision "shell", inline: <<-SHELL
         cp /vagrant/aliyun.list /etc/apt/sources.list.d/
         DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -yq python && apt-get install -yq language-pack-zh-hans
       SHELL
-      config.vm.provision "ansible" do |ansible|
-        ansible.groups= {
-          "nodes" => ["#{guest_prifix}-[1:#{num_guests}]"]
-        }
-        ansible.playbook = "ceph-playbook.yml"
-      
+    
+      if (i == num_guests) 
+        config.vm.provision "ansible" do |ansible|
+          ansible.groups= {
+            "nodes" => ["#{guest_prifix}-[1:#{num_guests}]"]
+          }
+          ansible.playbook = "ceph-playbook.yml"
+        end 
       end
     end
   end

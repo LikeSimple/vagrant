@@ -1,0 +1,4 @@
+- apt:
+    name: ntp
+    state: present
+    update_cache: yes
