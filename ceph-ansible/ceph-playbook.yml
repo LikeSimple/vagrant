@@ -1,0 +1,10 @@
+---
+- hosts: nodes
+  # vars:
+  become: yes
+  gather_facts: no
+  tasks:
+  - name: enable ntp support
+    apt:
+      name: ntp
+      update_cache: yes

@@ -3,11 +3,10 @@
 
 Vagrant.configure("2") do |config|
 
-  # 配置客户机代理
+  # 配置代理
   if Vagrant.has_plugin?("vagrant-proxyconf")
 
     host_proxy = "http://192.168.1.101:8118/"
-
     config.proxy.http     = host_proxy
     config.proxy.https    = host_proxy
     config.proxy.ftp      = host_proxy
@@ -15,52 +14,57 @@ Vagrant.configure("2") do |config|
     config.proxy.no_proxy = "localhost,127.0.0.1,.example.com,192.168.0.0/16,172.16.0.0/12,10.0.0.0/8"
   end
 
-  #配置客户机主机名解析
+  # 配置主机名解析
   if Vagrant.has_plugin?("vagrant-hostmanager")
     config.hostmanager.enabled = true
     config.hostmanager.manage_guest = true
+    # 配置宿主机上的虚拟机解析（default: false）
+    # config.hostmanager.manage_host = true
     config.hostmanager.include_offline = true
   end
 
+  #相关数据配置，考虑之后放外部属性文件
+  num_guests = 1
+  vb_cpus  = 2
+  vb_memory = "2048"
+  bridge_interface = "en7: USB 10/100/1000 LAN"
+  guest_prifix = "ceph"
 
-  instances_count = 3
-  bridge_interface = "enp4s0f0"
-  host_prifix = "ceph"
+  (1..num_guests).each do |i|
+    
+    guest_name = "#{guest_prifix}-#{i}"
 
-  (1..instances_count).each do |i|
-  
-    config.vm.define "#{host_prifix}-#{i}" do |node|
-
+    config.vm.define guest_name do |node|
+      node.proxy.enabled  = false
       node.vm.box_check_update = false
       node.vm.box = "ubuntu/xenial64"
-      node.vm.hostname = "#{host_prifix}-#{i}"
+      node.vm.hostname = guest_name
       # node.vm.network "forwarded_port", guest: 80, host: 8080
       node.vm.network "private_network", ip: "192.168.33.#{100+i}"
 
       node.vm.network "public_network", bridge: bridge_interface, auto_config: true
-      # config.vm.synced_folder "../data", "/vagrant_data"
+      node.vm.synced_folder ".", "/vagrant"
 
       node.vm.provider "virtualbox" do |vb|
       
         vb.gui = false
-        vb.memory = "4096"
-        vb.cpus = 2
-        vb.name = "#{host_prifix}-#{i}"
+        vb.memory = vb_memory
+        vb.cpus = vb_cpus
+        vb.name = guest_name
       end
       
-      config.vm.provision :shell, :inline => "DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -yq python && apt-get install language-pack-zh-hans", :privileged => true
+      config.vm.provision "shell", inline: <<-SHELL
+        cp /vagrant/aliyun.list /etc/apt/sources.list.d/
+        DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -yq python && apt-get install -yq language-pack-zh-hans
+      SHELL
+      config.vm.provision "ansible" do |ansible|
+        ansible.groups= {
+          "nodes" => ["#{guest_prifix}-[1:#{num_guests}]"]
+        }
+        ansible.playbook = "ceph-playbook.yml"
+      
+      end
     end
-    #
-    # View the documentation for the provider you are using for more
-    # information on available options.
-
-    # Enable provisioning with a shell script. Additional provisioners such as
-    # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-    # documentation for more information about their specific syntax and use.
-    # config.vm.provision "shell", inline: <<-SHELL
-    #   apt-get update
-    #   apt-get install -y apache2
-    # SHELL
   end
 
 
