@@ -1,0 +1,9 @@
+docker_common_packages:
+  - "apt-transport-https"
+  - "software-properties-common"
+  - "ca-certificates"
+  - "curl"
+kube_components:
+  - "kubectl"
+  - "kubelet"
+  - "kubeadm"

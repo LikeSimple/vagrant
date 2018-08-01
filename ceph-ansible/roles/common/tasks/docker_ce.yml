@@ -1,0 +1,18 @@
+- apt:
+    name: "{{ docker_common_packages }}"
+    state: present
+    update_cache: yes
+- apt_key:
+    url: "https://download.docker.com/linux/ubuntu/gpg"
+    state: present
+- shell: echo "deb https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
+  register: output
+- apt_repository:
+    repo: "{{ output.stdout }}"
+    state: present
+- shell: echo "$(apt-cache madison docker-ce | grep 17.03 | head -1 | awk '{print $3}')"
+  register: output
+- apt:
+    name: "docker-ce={{ output.stdout }}"
+    state: present
+    update_cache: yes

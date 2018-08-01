@@ -1,0 +1,4 @@
+- apt:
+    name: docker.io
+    state: present
+    update_cache: yes

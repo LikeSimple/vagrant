@@ -1,8 +1,4 @@
 - name: install ntp server
   import_tasks: ntp.yml
-- name: install docker common
-  import_tasks: docker-common.yml
-- name: install docker key
-  import_tasks: docker-key.yml
-- name: install docker repository
-  import_tasks: docker-repository.yml
+- name: install docker
+  import_tasks: docker.yml
