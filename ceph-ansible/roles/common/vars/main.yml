@@ -7,3 +7,5 @@ kube_components:
   - "kubectl"
   - "kubelet"
   - "kubeadm"
+ubuntu_common_packages:
+  - language-pack-zh-hans

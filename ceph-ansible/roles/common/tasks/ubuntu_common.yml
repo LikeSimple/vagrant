@@ -1,4 +1,4 @@
 - apt:
-    name: ntp
+    name: "{{ ubuntu_common_packages }}"
     state: present
     update_cache: yes

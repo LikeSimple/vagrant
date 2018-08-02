@@ -1,4 +1,4 @@
-- name: install ntp server
-  import_tasks: ntp.yml
+- name: install common components
+  import_tasks: ubuntu_common.yml
 - name: install docker
-  import_tasks: docker.yml
+  import_tasks: docker_ce.yml
