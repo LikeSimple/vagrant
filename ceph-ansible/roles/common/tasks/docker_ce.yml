@@ -3,10 +3,10 @@
     state: present
     update_cache: yes
 - apt_key:
-    url: "https://download.docker.com/linux/ubuntu/gpg"
+    url: "http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg"
     state: present
-    # validate_certs: false 
-- shell: echo "deb https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
+    # validate_certs: false
+- shell: echo "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
   register: output
 - apt_repository:
     repo: "{{ output.stdout }}"
