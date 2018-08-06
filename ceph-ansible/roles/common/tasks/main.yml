@@ -2,3 +2,5 @@
   import_tasks: ubuntu_common.yml
 - name: install docker
   import_tasks: docker_ce.yml
+- name: install kube components
+  import_tasks: kube_components.yml
