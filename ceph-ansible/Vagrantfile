@@ -5,15 +5,9 @@ Vagrant.configure("2") do |config|
 
   # 配置代理
   if Vagrant.has_plugin?("vagrant-proxyconf")
-<<<<<<< HEAD
   
     host_proxy = "http://192.168.1.101:8818" # Family Proxy Setting
     # host_proxy = "http://172.20.10.2:1087/" # MacBook Pro Proxy Setting
-=======
-    config.proxy.enabled  = false
-    host_proxy = "http://192.168.1.101:8118" # Family Proxy Setting
-    # host_proxy = "http://192.168.1.11:1087/" # Compony Proxy Setting
->>>>>>> ccbf794c2561f8db86a3d71c7ea1c9007e1209b3
     config.proxy.http     = host_proxy
     config.proxy.https    = host_proxy
     config.proxy.ftp      = host_proxy
@@ -34,14 +28,8 @@ Vagrant.configure("2") do |config|
   num_guests = 1
   vb_cpus  = 2
   vb_memory = "2048"
-<<<<<<< HEAD
   bridge_interface = "en7: USB 10/100/1000 LAN" # Macbook Pro Ethernet
   # bridge_interface = "en0: Wi-Fi (AirPort)" # Macbook Pro wifi
-=======
-  # bridge_interface = "en7: USB 10/100/1000 LAN" # Macbook Pro Ethernet
-  # bridge_interface = "en0: Wi-Fi (AirPort)" # Macbook Pro Wifi
-  bridge_interface = "enp4s0f0"
->>>>>>> ccbf794c2561f8db86a3d71c7ea1c9007e1209b3
   guest_prifix = "ceph"
 
   (1..num_guests).each do |i|
@@ -67,14 +55,8 @@ Vagrant.configure("2") do |config|
         vb.name = guest_name
       end
       
-<<<<<<< HEAD
       config.vm.provision "shell", inline: <<-SHELL
         cp /etc/apt/sources.list ~/sources.list.back && cat /vagrant/aliyun.list > /etc/apt/sources.list
-=======
-      
-      config.vm.provision "shell", inline: <<-SHELL
-        # cp /etc/apt/sources.list ~/sources.list.back && cat /vagrant/aliyun.list > /etc/apt/sources.list
->>>>>>> ccbf794c2561f8db86a3d71c7ea1c9007e1209b3
         DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -yq upgrade && apt-get install -yq language-pack-zh-hans
       SHELL
     
