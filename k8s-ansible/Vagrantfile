@@ -27,11 +27,11 @@ Vagrant.configure("2") do |config|
   #相关数据配置，考虑之后放外部属性文件
   num_guests = 1
   vb_cpus  = 2
-  vb_memory = "2048"
+  vb_memory = "4096"
   # bridge_interface = "en7: USB 10/100/1000 LAN" # Macbook Pro Ethernet
   # bridge_interface = "en0: Wi-Fi (AirPort)" # Macbook Pro wifi
   bridge_interface = "enp4s0f0"
-  guest_prifix = "ceph"
+  guest_prifix = "k8s-master"
 
   (1..num_guests).each do |i|
     
@@ -43,7 +43,7 @@ Vagrant.configure("2") do |config|
       node.vm.box = "ubuntu/xenial64"
       node.vm.hostname = guest_name
       # node.vm.network "forwarded_port", guest: 80, host: 8080
-      node.vm.network "private_network", ip: "192.168.33.#{100+i}"
+      node.vm.network "private_network", ip: "192.168.33.#{10+i}"
 
       node.vm.network "public_network", bridge: bridge_interface, auto_config: true
       node.vm.synced_folder ".", "/vagrant"
@@ -68,7 +68,7 @@ Vagrant.configure("2") do |config|
             "nodes:vars" => {"ansible_python_interpreter" => "/usr/bin/python3"}
           }
           
-          ansible.playbook = "ceph-playbook.yml"
+          ansible.playbook = "k8s-playbook.yml"
         end 
       end
     end
