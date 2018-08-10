@@ -7,5 +7,4 @@ kube_components:
   - "kubectl"
   - "kubelet"
   - "kubeadm"
-ubuntu_common_packages:
-  - language-pack-zh-hans
+docker_mirrors: "https://vpbh2n02.mirror.aliyuncs.com"

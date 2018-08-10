@@ -1,0 +1,7 @@
+kube_components:
+  - "kubectl"
+  - "kubelet"
+  - "kubeadm"
+pod_subnet: 10.244.0.0/16
+kube_version: 1.11.1
+advertise_address: 192.168.33.101

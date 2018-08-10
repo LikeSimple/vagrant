@@ -1,0 +1,4 @@
+- name: install docker
+  import_tasks: docker_ce.yml
+- name: create aliyun mirrors
+  import_tasks: docker_aliyun_mirrors.yml

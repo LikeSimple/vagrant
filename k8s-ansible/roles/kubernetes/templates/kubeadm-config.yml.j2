@@ -1,0 +1,7 @@
+apiVersion: kubeadm.k8s.io/v1alpha1
+kind: MasterConfiguration
+api:
+  advertiseAddress: {{ advertise_address }}
+networking:
+  podSubnet: "{{ pod_subnet }}"
+kubernetesVersion: {{ kube_version }}

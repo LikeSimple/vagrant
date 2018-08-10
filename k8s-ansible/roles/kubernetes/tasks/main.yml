@@ -1,0 +1,2 @@
+- name: install kube components
+  import_tasks: kube_components.yml
