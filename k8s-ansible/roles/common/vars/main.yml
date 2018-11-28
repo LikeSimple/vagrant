@@ -1,2 +1,4 @@
-ubuntu_common_packages:
-  - language-pack-zh-hans
+---
+
+# ubuntu_common_packages:
+#   - language-pack-zh-hans

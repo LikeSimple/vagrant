@@ -20,57 +20,95 @@ Vagrant.configure("2") do |config|
     config.hostmanager.enabled = true
     config.hostmanager.manage_guest = true
     # 配置宿主机上的虚拟机解析（default: false）
-    # config.hostmanager.manage_host = true
+    config.hostmanager.manage_host = true
     config.hostmanager.include_offline = true
   end
 
   #相关数据配置，考虑之后放外部属性文件
-  num_guests = 1
-  vb_cpus  = 2
-  vb_memory = "4096"
+  box_name = "jimmy-xu/ubuntu-18.04"
+  num_master = 1
+  num_node = 3
+  vb_cpus  = 1
+  vb_memory = "2048"
   # bridge_interface = "en7: USB 10/100/1000 LAN" # Macbook Pro Ethernet
-  # bridge_interface = "en0: Wi-Fi (AirPort)" # Macbook Pro wifi
-  bridge_interface = "enp4s0f0"
-  guest_prifix = "k8s-master"
+  bridge_interface = "en0: Wi-Fi (AirPort)" # Macbook Pro wifi
+  # bridge_interface = "enp4s0f0"
+  master_prefix = "k8s-master"
+  node_prefix = "k8s-node"
 
-  (1..num_guests).each do |i|
-    
-    guest_name = "#{guest_prifix}-#{i}"
-
+  # 配置虚拟机配置
+  (1..num_master).each do |i|
+    guest_name = "#{master_prefix}-#{i}"
     config.vm.define guest_name do |node|
-
       node.vm.box_check_update = false
-      node.vm.box = "ubuntu/xenial64"
+      node.vm.box = box_name
       node.vm.hostname = guest_name
-      # node.vm.network "forwarded_port", guest: 80, host: 8080
+      # node.vm.network "forwarded_port", guest: 80, host: "#{18080+i}"
       node.vm.network "private_network", ip: "192.168.33.#{10+i}"
 
       node.vm.network "public_network", bridge: bridge_interface, auto_config: true
       node.vm.synced_folder ".", "/vagrant"
 
       node.vm.provider "virtualbox" do |vb|
-      
         vb.gui = false
         vb.memory = vb_memory
         vb.cpus = vb_cpus
         vb.name = guest_name
       end
       
-      config.vm.provision "shell", inline: <<-SHELL
-        cp /etc/apt/sources.list ~/sources.list.back && cat /vagrant/aliyun.list > /etc/apt/sources.list
-        DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -yq upgrade && apt-get install -yq language-pack-zh-hans
-      SHELL
+      # config.vm.provision "shell", inline: <<-SHELL
+      #   cp /etc/apt/sources.list ~/sources.list.back && cat /vagrant/aliyun.list > /etc/apt/sources.list
+      #   DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -yq upgrade && apt-get install -yq language-pack-zh-hans
+      # SHELL
     
-      if (i == num_guests) 
-        config.vm.provision "ansible" do |ansible|
-          ansible.groups= {
-            "nodes" => ["#{guest_prifix}-[1:#{num_guests}]"],
-            "nodes:vars" => {"ansible_python_interpreter" => "/usr/bin/python3"}
-          }
+      # if (i == num_guests)
+      #   config.vm.provision "ansible" do |ansible|
+      #     ansible.groups= {
+      #       "nodes" => ["#{guest_prifix}-[1:#{num_guests}]"],
+      #       "nodes:vars" => {"ansible_python_interpreter" => "/usr/bin/python3"}
+      #     }
           
-          ansible.playbook = "k8s-playbook.yml"
-        end 
+      #     ansible.playbook = "k8s-playbook.yml"
+      #   end 
+      # end
+    end
+  end
+
+  (1..num_node).each do |i|
+
+    guest_name = "#{node_prefix}-#{i}"
+
+    config.vm.define guest_name do |node|
+      node.vm.box_check_update = false
+      node.vm.box = box_name
+      node.vm.hostname = guest_name
+      # node.vm.network "forwarded_port", guest: 80, host: "#{18080+i}"
+      node.vm.network "private_network", ip: "192.168.33.#{30+i}"
+
+      node.vm.network "public_network", bridge: bridge_interface, auto_config: true
+      node.vm.synced_folder ".", "/vagrant"
+
+      node.vm.provider "virtualbox" do |vb|
+        vb.gui = false
+        vb.memory = vb_memory
+        vb.cpus = vb_cpus
+        vb.name = guest_name
       end
+
+      # if ( i ==  num_node )
+      #   config.vm.provision "ansible" do |ansible|
+      #     ansible.groups= {
+      #       "clients"      => ["#{master_prefix}-[1:#{num_master}]", "#{node_prefix}-[1:#{num_node}]"],
+      #       "masters"      => ["#{master_prefix}-[1:#{num_master}]"],
+      #       "nodes"        => ["#{node_prefix}-[1:#{num_node}]"],
+      #       "clients:vars" => {"ansible_python_interpreter" => "/usr/bin/python3"},
+      #       "masters:vars" => {"ansible_python_interpreter" => "/usr/bin/python3"},
+      #       "nodes:vars"   => {"ansible_python_interpreter" => "/usr/bin/python3"}
+      #     }
+
+      #     ansible.playbook = "k8s-playbook.yml"
+      #   end
+      # end
     end
   end
 end

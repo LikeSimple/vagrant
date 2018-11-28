@@ -1,4 +1,9 @@
+---
+
 - apt:
     name: "{{ ubuntu_common_packages }}"
     state: present
     update_cache: yes
+  when: 
+  - ubuntu_common_packages is defined
+  - ubuntu_common_packages|length > 0

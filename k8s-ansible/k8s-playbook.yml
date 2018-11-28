@@ -1,8 +1,8 @@
 ---
+
 - hosts: nodes
   become: yes
   gather_facts: yes
   roles:
     - common
     - docker
-    - kubernetes

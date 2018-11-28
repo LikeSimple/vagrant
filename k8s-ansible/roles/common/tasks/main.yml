@@ -1,2 +1,4 @@
+---
+
 - name: install common components
-  import_tasks: ubuntu_common.yml
+  include_tasks: ubuntu_common.yml
